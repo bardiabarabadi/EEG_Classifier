@@ -10,14 +10,14 @@ function X = speechSpectrograms(ads,segmentDuration,frameDuration,hopDuration,nu
 disp("Computing speech spectrograms...");
 
 fs        = 256;
-FFTLength = 1024*8;
-persistent filterBank
-if isempty(filterBank)
+FFTLength = 512;
+%persistent filterBank
+%if isempty(filterBank)
    filterBank = designAuditoryFilterBank(fs,'FrequencyScale','mel',...
                                             'FFTLength',FFTLength,...
                                             'NumBands',numBands,...
-                                            'FrequencyRange',[1,50]);
-end
+                                            'FrequencyRange',[0,40]);
+%end
 
 numHops = ceil((segmentDuration - frameDuration)/hopDuration);
 numFiles = length(ads.Files);
@@ -32,6 +32,7 @@ for i = 1:numFiles
         hopLength = round(hopDuration*fs);
 
         [~,~,~,spec] = spectrogram(x(:,channel),hann(frameLength,'periodic'),frameLength - hopLength,FFTLength,'onesided');
+        %[~,~,~,spec] = spectrogram(x(:,channel),ones([frameLength,1]),frameLength - hopLength,FFTLength,'onesided');
         spec = filterBank * spec;
 
         % If the spectrogram is less wide than numHops, then put spectrogram in

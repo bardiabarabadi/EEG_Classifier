@@ -35,10 +35,24 @@ classdef weightedClassificationLayer < nnet.layer.ClassificationLayer
             
             N = size(Y,4);
             Y = squeeze(Y);
+            Y_zero = Y==0;
+            Y(Y_zero) = 1e-10;
             T = squeeze(T);
             W = layer.ClassWeights;
     
             loss = -sum(W*(T.*log(Y)))/N;
+            
+            if isnan(loss)
+                disp (N)
+                disp (Y)
+                disp (T)
+                disp (W)
+                disp (loss);
+                save ('errored.mat')
+                %error ('Loss is NaN');
+            end
+            
+            
         end
         
         function dLdY = backwardLoss(layer, Y, T)
